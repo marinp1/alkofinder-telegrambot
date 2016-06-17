@@ -1,0 +1,7 @@
+.settings/
+target/
+.cache-main
+.project
+.classpath
+src/main/resources/data.json
+src/main/scala/fi/patrikmarin/alkofinderbot/app/Keys.scala
