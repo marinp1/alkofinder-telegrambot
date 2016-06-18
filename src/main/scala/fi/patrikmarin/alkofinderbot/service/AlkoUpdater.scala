@@ -12,9 +12,10 @@ import fi.patrikmarin.alkofinderbot.app.AppParameters
 import fi.patrikmarin.alkofinderbot.dummy.Alko
 import fi.patrikmarin.alkofinderbot.app.App
 
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.firefox.FirefoxBinary
-import org.openqa.selenium.firefox.FirefoxProfile
+import java.util.concurrent.TimeUnit
+
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Creates a web browser instance (Chrome) with Selenium and 
@@ -30,9 +31,6 @@ object AlkoUpdater {
   private val OPEN_HOURS_CLASS: String  = "."  +  "opening-hours-value"
   private val ADDRESS_CLASS: String     = "."  +  "address-value"
   
-  // Timeout to wait for the page to load
-  private val PAGE_TIMEOUT: Int = 15000
-  
   // Last time the store data was fetched
   var last_update: LocalDateTime = null;
   
@@ -45,21 +43,31 @@ object AlkoUpdater {
   private def getDocument(): Option[Document] = {
     
     try {
-      // Initialise browser
-      val client = new FirefoxDriver(new FirefoxBinary(new java.io.File(AppParameters.FIREFOX_LOCATION + "/firefox")), new FirefoxProfile())
       
-      // Navigate
-      client.get(ALKO_URL)
+      // Set capabilities for the driver
+      val capabilities = new DesiredCapabilities()
+      capabilities.setJavascriptEnabled(true)
+      capabilities.setCapability("takesScreenshot", false)
       
-      // Wait for content to load
-      Thread.sleep(PAGE_TIMEOUT)
+      // Set system property for the phantomjs binary
+      System.setProperty("phantomjs.binary.path", AppParameters.PHANTOM_LOCATION)
+      
+      // Create WebDriver as PhantomJSDriver with capabilities
+      val driver = new PhantomJSDriver(capabilities)
+      
+      // Wait 5 seconds so the PhantomJS doesn't fail on random occasions
+      Thread.sleep(5000)
+      
+      // Wait maximum of 45 seconds for the page to load
+      driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS)
+      driver.get(ALKO_URL)
       
       // Create JsoupBrowser instance in order to parse the data
       val browser = new JsoupBrowser()
-      val doc: Document = browser.parseString(client.getPageSource)
+      val doc: Document = browser.parseString(driver.getPageSource())
       
       // Close the browser
-      client.quit()
+      driver.quit()
       
       return Some(doc)
     } catch {

@@ -9,8 +9,8 @@ object AppParameters {
     // The name of the bot
     val TELEGRAM_BOT_NAME: String = "Alkofinder-bot"
     
-    // The path of Firefox 45.x installation folder
-    val FIREFOX_LOCATION: String = "/usr/lib/firefox"
+    // The path to the phantomjs binary
+    val PHANTOM_LOCATION: String = "src/main/resources/phantomjs/phantomjs"
     
     // The datetime format for data reading
     val DATETIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")

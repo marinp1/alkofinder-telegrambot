@@ -4,4 +4,5 @@ target/
 .project
 .classpath
 src/main/resources/data.json
+src/main/resources/phantomjs/*
 src/main/scala/fi/patrikmarin/alkofinderbot/app/Keys.scala
