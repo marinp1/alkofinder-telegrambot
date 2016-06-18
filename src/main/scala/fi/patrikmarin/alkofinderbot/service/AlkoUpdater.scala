@@ -12,6 +12,10 @@ import fi.patrikmarin.alkofinderbot.app.AppParameters
 import fi.patrikmarin.alkofinderbot.dummy.Alko
 import fi.patrikmarin.alkofinderbot.app.App
 
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxBinary
+import org.openqa.selenium.firefox.FirefoxProfile
+
 /**
  * Creates a web browser instance (Chrome) with Selenium and 
  * fetches all Alko stores found in Alko's site.
@@ -42,11 +46,7 @@ object AlkoUpdater {
     
     try {
       // Initialise browser
-      System.setProperty("webdriver.chrome.driver", AppParameters.CHROME_DRIVER_LOCATION);
-      val options = new org.openqa.selenium.chrome.ChromeOptions()
-      options.setBinary("/usr/bin/chromium-browser")
-      val client = new org.openqa.selenium.chrome.ChromeDriver(options)
-      
+      val client = new FirefoxDriver(new FirefoxBinary(new java.io.File(AppParameters.FIREFOX_LOCATION + "/firefox")), new FirefoxProfile())
       
       // Navigate
       client.get(ALKO_URL)

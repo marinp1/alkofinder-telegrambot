@@ -7,11 +7,14 @@ import org.scala_tools.time.Imports._
  */
 object AppParameters {
     // The name of the bot
-    val TELEGRAM_BOT_NAME: String = "Alko locator"
-    // The Chrome driver location, required for Selenium
-    val CHROME_DRIVER_LOCATION: String = "src/main/resources/chromedriver"
+    val TELEGRAM_BOT_NAME: String = "Alkofinder-bot"
     
+    // The path of Firefox 45.x installation folder
+    val FIREFOX_LOCATION: String = "/usr/lib/firefox"
+    
+    // The datetime format for data reading
     val DATETIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     
+    // The file where to store the fetched data
     val ALKO_DATA_LOCATION: String = "src/main/resources/data.json"
 }

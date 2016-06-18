@@ -20,7 +20,7 @@ object App extends App {
   var alkos: Array[Alko] = Array()
   
   /** 
-   *  Registers the bot and tries toread the store data
+   *  Registers the bot and tries to read the store data
    *  from stored JSON file.
    */
   private def registerBot(): Unit = {
