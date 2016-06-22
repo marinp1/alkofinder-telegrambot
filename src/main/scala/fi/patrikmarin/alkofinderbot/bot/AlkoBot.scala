@@ -6,6 +6,7 @@ import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.methods.send.SendVenue
 import org.telegram.telegrambots.api.objects.Update
 import org.telegram.telegrambots.api.objects.Message
+import org.telegram.telegrambots.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent
 import org.telegram.telegrambots.api.objects.inlinequery.InlineQuery
 import org.telegram.telegrambots.api.objects.inlinequery.result.InlineQueryResult
 import org.telegram.telegrambots.api.objects.inlinequery.result.InlineQueryResultVenue
@@ -40,26 +41,32 @@ class AlkoBot extends TelegramLongPollingBot  {
    * @param msg the message that the user sent
    * @return true if the list is correct
    */
-  private def updateList(msg: Message = null): Boolean = {
-    // If the list was updated today, return true
-    if(Utils.daysUntil(LocalDateTime.now, AlkoUpdater.last_update) == 0) {
-      true
+  private def updateList(msg: Either[Message, InlineQuery]): Boolean = {    
+    if(Utils.daysUntil(AlkoUpdater.last_update, LocalDateTime.now) == 0) {
+      return true
     } else {
-      
-      // Send status message for user to inform
-      // that the program is updating
-      val sendMessageRequest = new SendMessage();
-      sendMessageRequest.setChatId(msg.getChatId().toString());
-      sendMessageRequest.setText("Päivitetään...\nOdota hetki.");
-      
-      try {
-        sendMessage(sendMessageRequest)
-      } catch {
-        case e: Throwable => e.printStackTrace()
+      if (msg.isLeft) {
+        // Send status message for user to inform
+        // that the program is updating
+        val sendMessageRequest = new SendMessage()
+        sendMessageRequest.setChatId(msg.left.get.getChatId().toString())
+        sendMessageRequest.setText("Päivitetään...\nOdota hetki.")
+        try {
+          sendMessage(sendMessageRequest)
+        } catch {
+          case e: Throwable => e.printStackTrace()
+        }
+      } else {
+        val inlineQuery = msg.right.get
+        try {
+          answerInlineQuery(getUpdateInlineQueryResult(inlineQuery));
+        } catch {
+          case e: Throwable => e.printStackTrace()
+        }
       }
       
       // Update the list
-      AlkoUpdater.forceUpdateAlkos();
+      return AlkoUpdater.forceUpdateAlkos();
     }
   }
   
@@ -76,7 +83,8 @@ class AlkoBot extends TelegramLongPollingBot  {
         "2. *Inline-queryn* avulla voit hakea Alkoja paikkakunnan mukaan.\n" + 
         "3. Komennolla */hakuteksti* voit myös hakea Alkoja nimen tai osoitteen mukaan.\n\n" + 
         "Löydettyjen alkojen määrä: *" + App.alkos.size + "*\n" + 
-        "Viimeksi päivitetty: *" + AppParameters.DATETIME_FORMATTER.print(AlkoUpdater.last_update) + "*")
+        "Viimeksi päivitetty: *" + AppParameters.DATETIME_FORMATTER.print(AlkoUpdater.last_update) + "*\n" +
+        "Ohjelma päivittyy itsestään kun tarve vaatii.")
       
     try {
       sendMessage(sendMessageRequest)
@@ -111,7 +119,7 @@ class AlkoBot extends TelegramLongPollingBot  {
    */
   private def alkosByText(msg: Message) = {
     // Check update
-    if(updateList(msg)) {
+    if(updateList(Left(msg))) {
       // The found Alko stores by the search parameter
       val closestAlkos: Array[Alko] = App.getAlkosByString(msg.getText().substring(1))
       // The list which to loop
@@ -174,7 +182,7 @@ class AlkoBot extends TelegramLongPollingBot  {
    */
   private def closestAlkos(msg: Message): Unit = {
     // Check update
-    if(updateList(msg)) {
+    if(updateList(Left(msg))) {
       if ((msg.getForwardFrom != null && msg.getForwardFrom.getId == this.getMe.getId) || msg.getFrom.getId == this.getMe.getId) {
         // If the message was sent by the bot or forwarded from the bot, don't do anything.
         println("Skip response to own message.")
@@ -208,7 +216,7 @@ class AlkoBot extends TelegramLongPollingBot  {
    */
   private def getAlkosForInline(inlineQuery: InlineQuery): Unit = {
     // Check updates
-    if(updateList()) {
+    if(updateList(Right(inlineQuery))) {
       val query: String = inlineQuery.getQuery()
       // Log the query
       println("Searching: " + query)
@@ -228,6 +236,31 @@ class AlkoBot extends TelegramLongPollingBot  {
       }
       
     }
+  }
+  
+  /**
+   * Answers to an inline query if the program is updating.
+   */
+  private def getUpdateInlineQueryResult(inlineQuery: InlineQuery): AnswerInlineQuery = {
+    val answerInlineQuery = new AnswerInlineQuery()
+    
+    answerInlineQuery.setInlineQueryId(inlineQuery.getId())
+    answerInlineQuery.setCacheTime(CACHETIME);
+    
+    val results = new ArrayBuffer[InlineQueryResult]()
+    
+    val result = new InlineQueryResultArticle()
+    result.setId("UpdateID" + Math.random() * 100)
+    result.setTitle("Päivitetään...")
+    val message = new InputTextMessageContent()
+    message.enableMarkdown(true)
+    message.setMessageText("Yritä myöhemmin uudelleen.")
+    result.setInputMessageContent(message)
+    results += result
+    
+    answerInlineQuery.setResults(results.asJava)
+    
+    return answerInlineQuery;
   }
   
   /** 

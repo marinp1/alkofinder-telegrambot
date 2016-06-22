@@ -32,7 +32,8 @@ object AlkoUpdater {
   private val ADDRESS_CLASS: String     = "."  +  "address-value"
   
   // Last time the store data was fetched
-  var last_update: LocalDateTime = null;
+  var last_update: LocalDateTime = null
+  var failCount = 0
   
   /**
    * Creates a Chrome instance with Selenium and navigates
@@ -54,13 +55,14 @@ object AlkoUpdater {
       
       // Create WebDriver as PhantomJSDriver with capabilities
       val driver = new PhantomJSDriver(capabilities)
+      val js = "var page = this; page.clearCookies(); page.clearMemoryCache(); page.close(); return 'DONE';";
       
       // Wait 5 seconds so the PhantomJS doesn't fail on random occasions
       Thread.sleep(5000)
       
+      driver.get(ALKO_URL)
       // Wait maximum of 45 seconds for the page to load
       driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS)
-      driver.get(ALKO_URL)
       
       // Create JsoupBrowser instance in order to parse the data
       val browser = new JsoupBrowser()
@@ -127,8 +129,6 @@ object AlkoUpdater {
 
     }
     
-    println("Returning results for " + stores.size + " stores.")
-    
     // Return list of found stores
     return stores
   }
@@ -160,7 +160,7 @@ object AlkoUpdater {
    * @return true if the update was successful
    */
   def forceUpdateAlkos(): Boolean = {
-    println("Fetching new list...")
+    println("Fetching new list... Attempt " + failCount + " / " + 20)
     
     // Try to fetch new content
     val tryFetch = AlkoUpdater.getAlkos()
@@ -168,10 +168,23 @@ object AlkoUpdater {
     // If successful, update the container and 
     // save the data to file
     if (tryFetch.isDefined) {
-      App.alkos = tryFetch.get.toArray
-      JsonReader.saveAlkosToFile()
-      last_update = LocalDateTime.now;
-      return true
+      
+      if (tryFetch.get.nonEmpty) {
+        App.alkos = tryFetch.get.toArray
+        JsonReader.saveAlkosToFile()
+        last_update = LocalDateTime.now;
+        println("[DONE] Returning results for " + tryFetch.get.size + " stores.")
+        return true
+      } else if (failCount <= 20) {
+        Thread.sleep(2000)
+        println("[ERROR] Failed to get data.")
+        failCount += 1
+        return forceUpdateAlkos()
+      } else {
+        println("Couldn't update list, shutting down...")
+        System.exit(0)
+        return false
+      }
     } else {
       println("Error, shutting down...")
       System.exit(0)

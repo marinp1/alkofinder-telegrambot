@@ -13,7 +13,7 @@ object Utils {
    */
   def daysUntil(source: LocalDateTime, target: LocalDateTime): Int = {
     // Copy the source date
-    var newDate = LocalDateTime.fromDateFields(source.toDate())
+    var newDate = source
     
     var daysUntil = 0;
     
