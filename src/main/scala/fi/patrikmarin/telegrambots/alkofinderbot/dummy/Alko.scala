@@ -1,4 +1,4 @@
-package fi.patrikmarin.alkofinderbot.dummy
+package fi.patrikmarin.telegrambots.alkofinderbot.dummy
 
 /**
  * Represents an Alko store.

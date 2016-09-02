@@ -1,4 +1,4 @@
-package fi.patrikmarin.alkofinderbot.bot
+package fi.patrikmarin.telegrambots.alkofinderbot.bot
 
 import org.scala_tools.time.Imports._
 import org.telegram.telegrambots.api.methods.AnswerInlineQuery
@@ -15,14 +15,12 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConverters._
 import org.scala_tools.time.Imports._
-import fi.patrikmarin.alkofinderbot.app.Keys
-import fi.patrikmarin.alkofinderbot.app.AppParameters
-import fi.patrikmarin.alkofinderbot.dummy.Alko
-import fi.patrikmarin.alkofinderbot.service.AlkoUpdater
-import fi.patrikmarin.alkofinderbot.app.App
-import fi.patrikmarin.alkofinderbot.dummy.Location
-import fi.patrikmarin.alkofinderbot.app.Utils
-import fi.patrikmarin.alkofinderbot.service.AlkoUpdater
+import fi.patrikmarin.telegrambots.app.Keys
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Alko
+import fi.patrikmarin.telegrambots.alkofinderbot.service.AlkoUpdater
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Location
+import fi.patrikmarin.telegrambots.alkofinderbot.service.AlkoUpdater
+import fi.patrikmarin.telegrambots.app.App
 
 /**
  * The bot itself, contains methods for answering
@@ -42,7 +40,7 @@ class AlkoBot extends TelegramLongPollingBot  {
    * @return true if the list is correct
    */
   private def updateList(msg: Either[Message, InlineQuery]): Boolean = {    
-    if(Utils.daysUntil(AlkoUpdater.last_update, LocalDateTime.now) == 0) {
+    if(Logic.daysUntil(AlkoUpdater.last_update, LocalDateTime.now) == 0) {
       return true
     } else {
       if (msg.isLeft) {
@@ -82,7 +80,7 @@ class AlkoBot extends TelegramLongPollingBot  {
         "1. Lähetä minulle *sijainti* niin kerron kolme lähintä Alkoa.\n" + 
         "2. *Inline-queryn* avulla voit hakea Alkoja paikkakunnan mukaan.\n" + 
         "3. Komennolla */hakuteksti* voit myös hakea Alkoja nimen tai osoitteen mukaan.\n\n" + 
-        "Löydettyjen alkojen määrä: *" + App.alkos.size + "*\n" + 
+        "Löydettyjen alkojen määrä: *" + Logic.alkos.size + "*\n" + 
         "Viimeksi päivitetty: *" + AppParameters.DATETIME_FORMATTER.print(AlkoUpdater.last_update) + "*\n" +
         "Ohjelma päivittyy itsestään kun tarve vaatii.")
       
@@ -121,7 +119,7 @@ class AlkoBot extends TelegramLongPollingBot  {
     // Check update
     if(updateList(Left(msg))) {
       // The found Alko stores by the search parameter
-      val closestAlkos: Array[Alko] = App.getAlkosByString(msg.getText().substring(1))
+      val closestAlkos: Array[Alko] = Logic.getAlkosByString(msg.getText().substring(1))
       // The list which to loop
       var filteredAlkos = closestAlkos
       
@@ -191,7 +189,7 @@ class AlkoBot extends TelegramLongPollingBot  {
         println("Skip response to venues.")
       } else {
         // Find the closest Alko stores
-        val closestAlkos: Array[Alko] = App.getClosestAlkos(new Location(msg.getLocation.getLatitude, msg.getLocation.getLongitude))
+        val closestAlkos: Array[Alko] = Logic.getClosestAlkos(new Location(msg.getLocation.getLatitude, msg.getLocation.getLongitude))
         
         // Loop through the found stores
         for (alko: Alko <- closestAlkos) {
@@ -226,7 +224,7 @@ class AlkoBot extends TelegramLongPollingBot  {
           if (query.size > 3) {
              
             // Find data by the query text and answer
-            val alkos = App.getAlkosByCity(query)
+            val alkos = Logic.getAlkosByCity(query)
             answerInlineQuery(convertResultsToResponse(inlineQuery, alkos));
           } else {
             answerInlineQuery(convertResultsToResponse(inlineQuery, Array()));
@@ -362,6 +360,6 @@ class AlkoBot extends TelegramLongPollingBot  {
    * @return the token of the bot
    */
   def getBotToken(): String = {
-    return Keys.TELEGRAM_BOT_TOKEN
+    return Keys.ALKOBOT_TELEGRAM_BOT_TOKEN
   }
 }

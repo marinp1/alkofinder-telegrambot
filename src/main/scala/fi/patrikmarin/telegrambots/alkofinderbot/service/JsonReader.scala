@@ -1,4 +1,4 @@
-package fi.patrikmarin.alkofinderbot.service
+package fi.patrikmarin.telegrambots.alkofinderbot.service
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
@@ -6,10 +6,10 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.scala_tools.time.Imports._
 import java.io._
-import fi.patrikmarin.alkofinderbot.app.App
-import fi.patrikmarin.alkofinderbot.app.AppParameters
-import fi.patrikmarin.alkofinderbot.app.Utils
-import fi.patrikmarin.alkofinderbot.dummy.Alko
+import fi.patrikmarin.telegrambots.app.App
+import fi.patrikmarin.telegrambots.alkofinderbot.bot.AppParameters
+import fi.patrikmarin.telegrambots.alkofinderbot.bot.Logic
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Alko
 
 /**
  * Reads and writes Alko stores from/to a JSON file.
@@ -59,7 +59,7 @@ object JsonReader {
         // Parse updated field to datetime
         val dt = AppParameters.DATETIME_FORMATTER.parseDateTime(o.get("updated").getAsString).toLocalDateTime()
         // If the data was updated today, read content from file
-        if (Utils.daysUntil(dt, LocalDateTime.now) == 0) {
+        if (Logic.daysUntil(dt, LocalDateTime.now) == 0) {
           println("Reading data from existing file...")
           
           // Read stores field as array
@@ -67,12 +67,12 @@ object JsonReader {
             
           // Generate Alko store objects with Gson
           val gson = new Gson();
-          App.alkos = gson.fromJson(arr, classOf[Array[Alko]])
+          Logic.alkos = gson.fromJson(arr, classOf[Array[Alko]])
           
           // Updated last_updated field
           AlkoUpdater.last_update = dt
           
-          println("Found " + App.alkos.length + " elements.")
+          println("Found " + Logic.alkos.length + " elements.")
         } else {
           // Otherwise update content
           AlkoUpdater.forceUpdateAlkos()
@@ -117,7 +117,7 @@ object JsonReader {
       o.addProperty("updated",AppParameters.DATETIME_FORMATTER.print(LocalDateTime.now))
       
       // Add stores field by converting Alkos to JSOn using Gson
-      o.add("stores", parser.parse(gson.toJson(App.alkos)).getAsJsonArray);
+      o.add("stores", parser.parse(gson.toJson(Logic.alkos)).getAsJsonArray);
       
       // Create Gson pretty printer
 		  val jsonBeautifier = new GsonBuilder().setPrettyPrinting().create()

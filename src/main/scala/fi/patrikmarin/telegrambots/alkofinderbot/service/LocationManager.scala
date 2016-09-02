@@ -1,8 +1,8 @@
-package fi.patrikmarin.alkofinderbot.service
+package fi.patrikmarin.telegrambots.alkofinderbot.service
 
 import scala.xml._
-import fi.patrikmarin.alkofinderbot.app.Keys
-import fi.patrikmarin.alkofinderbot.dummy.Location
+import fi.patrikmarin.telegrambots.app.Keys
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Location
 
 /**
  * Service class for finding geolocation

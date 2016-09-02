@@ -1,29 +1,30 @@
-package fi.patrikmarin.alkofinderbot.app
+package fi.patrikmarin.telegrambots.alkofinderbot.bot
 
 import org.scala_tools.time.Imports._
+
+import fi.patrikmarin.telegrambots.alkofinderbot.service._
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy._
 import org.telegram.telegrambots.TelegramBotsApi
 import org.telegram.telegrambots.logging.BotLogger
-import fi.patrikmarin.alkofinderbot.dummy.Alko
-import fi.patrikmarin.alkofinderbot.bot.AlkoBot
-import fi.patrikmarin.alkofinderbot.service.JsonReader
-import fi.patrikmarin.alkofinderbot.dummy.Location
-import fi.patrikmarin.alkofinderbot.service.LocationManager
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Alko
+import fi.patrikmarin.telegrambots.alkofinderbot.service.JsonReader
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy.Location
+import fi.patrikmarin.telegrambots.alkofinderbot.service.LocationManager
 
-/** 
- *  The main App for the program.
- *  Contains main functions for the bot and filtering
- *  methods for Alko stores.
+/**
+ * Object containing miscellaneous helper functions.
  */
-object App extends App {
+object Logic {
+  
   private var telegramBotsApi: TelegramBotsApi = null;
-  // The container for generated Alko objects.
+  
   var alkos: Array[Alko] = Array()
   
   /** 
    *  Registers the bot and tries to read the store data
    *  from stored JSON file.
    */
-  private def registerBot(): Unit = {
+  def registerBot(): Unit = {
     telegramBotsApi = new TelegramBotsApi()
     alkos = Array[Alko]()
     
@@ -34,6 +35,27 @@ object App extends App {
       case e: Throwable => BotLogger.error("MAIN", e)
     }
   }
+  
+  /**
+   * Calucates the number of days that are
+   * between given datetimes.
+   */
+  def daysUntil(source: LocalDateTime, target: LocalDateTime): Int = {
+    // Copy the source date
+    var newDate = source
+    
+    var daysUntil = 0;
+    
+    // Increment newDate by one day until it matches target
+    while (!newDate.toLocalDate().isEqual(target.toLocalDate())) {
+      newDate = newDate.plusDays(1)
+      daysUntil += 1
+    }
+    
+    // Return the result
+    return daysUntil
+  }
+  
   
   /**
    * Finds three closest Alko stores based on given location.
@@ -60,10 +82,5 @@ object App extends App {
    */
   def getAlkosByString(text: String): Array[Alko] = {
     alkos.filter(x => x.address.toLowerCase().contains(text.toLowerCase()) || x.title.toLowerCase().contains(text.toLowerCase()))
-  }
-  
-  // On startup register the bot
-  override def main(args: Array[String]) {
-      registerBot()
   }
 }

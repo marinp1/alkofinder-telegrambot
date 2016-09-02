@@ -1,4 +1,4 @@
-package fi.patrikmarin.alkofinderbot.service
+package fi.patrikmarin.telegrambots.alkofinderbot.service
 
 import org.scala_tools.time.Imports._
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
@@ -8,14 +8,15 @@ import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
 import scala.collection.mutable.ArrayBuffer
-import fi.patrikmarin.alkofinderbot.app.AppParameters
-import fi.patrikmarin.alkofinderbot.dummy.Alko
-import fi.patrikmarin.alkofinderbot.app.App
 
 import java.util.concurrent.TimeUnit
 
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import fi.patrikmarin.telegrambots.alkofinderbot.bot.AppParameters
+import fi.patrikmarin.telegrambots.alkofinderbot.dummy._
+import fi.patrikmarin.telegrambots.alkofinderbot.bot.Logic
 
 /**
  * Creates a web browser instance (Chrome) with Selenium and 
@@ -170,7 +171,7 @@ object AlkoUpdater {
     if (tryFetch.isDefined) {
       
       if (tryFetch.get.nonEmpty) {
-        App.alkos = tryFetch.get.toArray
+        Logic.alkos = tryFetch.get.toArray
         JsonReader.saveAlkosToFile()
         last_update = LocalDateTime.now;
         println("[DONE] Returning results for " + tryFetch.get.size + " stores.")
