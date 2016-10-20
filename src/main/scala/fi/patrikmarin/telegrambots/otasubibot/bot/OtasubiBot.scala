@@ -21,6 +21,7 @@ import scala.collection.mutable.Map
 class OtasubiBot extends TelegramLongPollingBot  {
   
   
+  // FIXME: Ghettocode
   var sublist = Map("1"   -> "Kana Fajita",
                     "2"   -> "Tonnikala",
                     "3"   -> "Kananrinta",
@@ -46,7 +47,7 @@ class OtasubiBot extends TelegramLongPollingBot  {
     val sendMessageRequest = new SendMessage();
     sendMessageRequest.enableMarkdown(true);
     sendMessageRequest.setChatId(msg.getChatId().toString());
-    sendMessageRequest.setText("Kertoo päivän subin")
+    sendMessageRequest.setText("Kerron päivän subin.")
       
     try {
       sendMessage(sendMessageRequest)

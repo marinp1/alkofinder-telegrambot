@@ -10,7 +10,7 @@ object AppParameters {
     val TELEGRAM_BOT_NAME: String = "Alkofinder-bot"
     
     // The path to the phantomjs binary
-    val PHANTOM_LOCATION: String = "src/main/resources/phantomjs"
+    val PHANTOM_LOCATION: String = "resources/phantomjs"
     
     // The datetime format for data reading
     val DATETIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")

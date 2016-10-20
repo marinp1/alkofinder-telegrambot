@@ -3,23 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fi.patrikmarin</groupId>
 
-	<artifactId>alkofinder-tgbot</artifactId>
+	<artifactId>telegrambots</artifactId>
 
-	<version>1.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 
-	<name>Alkofinder-tgbot</name>
+	<name>Telegrambots</name>
 
-	<description>Telegram bot for fetching information about Alko stores in Finland.</description>
+	<description>All my telegrams bots together in one project.</description>
 
 	<inceptionYear>2016</inceptionYear>
-	
-	<licenses>
-		<license>
-			<name>My License</name>
-			<url>http://....</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -58,7 +50,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>fi.patrikmarin.alkofinderbot.app.App</mainClass>
+							<mainClass>fi.patrikmarin.telegrambots.app.App</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -109,7 +101,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<mainClass>fi.patrikmarin.alkofinderbot.app.App</mainClass>
+					<mainClass>fi.patrikmarin.telegrambots.app.App</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
