@@ -106,6 +106,14 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<distributionManagement>
+		<repository>
+			<id>snapshots</id>
+			<name>Snapshot repository</name>
+			<url>http://192.168.1.171:8080/nexus-2.14.0-01/content/repositories/snapshots/</url>
+		</repository>
+	</distributionManagement>
 
 	<repositories>
 		<repository>
